@@ -55,5 +55,17 @@ export class TodoController {
         res.json(todo);
     }
 
+    async deleteTodoById(req: Request, res: Response) {
+        const { id } = req.params;
+        if (isNaN(+id)) return res.status(400).json({ message: 'Invalid id' });
+
+        const todoIndex = todos.findIndex(todo => todo.id === +id);
+        if (todoIndex === -1) {
+            return res.status(404).json({ message: 'Todo not found' });
+        }
+
+        res.status(200).json({ message: `Todo with id ${id} deleted successfully` });
+    }
+
 
 }
