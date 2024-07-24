@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../data/postgres";
 
-
-
 export class TodoController {
 
     constructor() { }
