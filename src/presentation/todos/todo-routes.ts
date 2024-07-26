@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { TodoController } from "./controller";
+import { TodoController } from "./todo-controller";
 
 
 export class TodoRoutes {
