@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../data/postgres";
-import { CreateTodoDto } from "../../domain/dtos";
+import { CreateTodoDto, UpdateTodoDto } from "../../domain/dtos";
 
 export class TodoController {
 
@@ -56,18 +56,21 @@ export class TodoController {
 
     updateTodo = async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
-            if (isNaN(+id)) return res.status(400).json({ message: 'Invalid id' });
+            const id = +req.params.id;
+            console.log(req.body)
 
-            const { text, completedAt } = req.body;
-            if (!text) return res.status(400).json({ message: 'Text is required' });
+            const [error, updateTodoDto] = UpdateTodoDto.create({ ...req.body, id });
+
+            if (error) return res.status(400).json({ message: error });
 
             const todoFounded = await this.findById(+id);
             if (!todoFounded) return res.status(404).json({ message: 'Todo not found' });
 
+            console.log(updateTodoDto!.values)
+
             const todo = await prisma.todo.update({
-                where: { id: +id },
-                data: { text, completedAt: completedAt ? new Date(completedAt) : null }
+                where: { id },
+                data: updateTodoDto!.values
             })
 
             res.json(todo);
