@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 import { prisma } from "../../data/postgres";
 import { CreateTodoDto, UpdateTodoDto } from "../../domain/dtos";
+import { TodoRepository } from "../../domain";
 
 export class TodoController {
 
-    constructor() { }
+    constructor(
+        private readonly todoRepository: TodoRepository,
+    ) { }
 
     findById = async (id: number) => {
         try {
@@ -19,24 +22,22 @@ export class TodoController {
 
     getTodos = async (req: Request, res: Response) => {
         try {
-            const todos = await prisma.todo.findMany();
+            const todos = await this.todoRepository.getAll();
             res.json(todos);
         } catch (err) {
-            return res.status(500).json({ message: 'Failed to get todos' });
+            console.log(err)
+            return res.status(500).json({ message: `${err}` });
         }
     }
 
     getTodoById = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-
-            const todo = await this.findById(+id);
-            if (!todo) return res.status(404).json({ message: 'Todo not found' });
-
+            const todo = await this.todoRepository.findById(+id);
             res.json(todo);
         } catch (err) {
             console.log(err)
-            return res.status(500).json({ message: 'Failed to get todo' });
+            return res.status(500).json({ message: `${err}` });
         }
     }
 
@@ -44,20 +45,18 @@ export class TodoController {
         try {
             const [error, createTodoDto] = CreateTodoDto.create(req.body);
             if (error) return res.status(400).json({ message: error });
-            const todo = await prisma.todo.create({
-                data: createTodoDto!,
-            })
+            const todo = await this.todoRepository.create(createTodoDto!);
 
             res.status(201).json(todo);
         } catch (err) {
-            return res.status(500).json({ message: 'Failed to create todo', data: err });
+            console.log(err)
+            return res.status(500).json({ message: `${err}` });
         }
     }
 
     updateTodo = async (req: Request, res: Response) => {
         try {
             const id = +req.params.id;
-            console.log(req.body)
 
             const [error, updateTodoDto] = UpdateTodoDto.create({ ...req.body, id });
 
@@ -66,16 +65,11 @@ export class TodoController {
             const todoFounded = await this.findById(+id);
             if (!todoFounded) return res.status(404).json({ message: 'Todo not found' });
 
-            console.log(updateTodoDto!.values)
-
-            const todo = await prisma.todo.update({
-                where: { id },
-                data: updateTodoDto!.values
-            })
-
+            const todo = await this.todoRepository.update(updateTodoDto!);
             res.json(todo);
         } catch (err) {
-            return res.status(500).json({ message: 'Failed to update todo' });
+            console.log(err)
+            return res.status(500).json({ message: `${err}` });
         }
     }
 
@@ -87,11 +81,12 @@ export class TodoController {
             const todoFounded = await this.findById(+id);
             if (!todoFounded) return res.status(404).json({ message: 'Todo not found' });
 
-            const todo = await prisma.todo.delete({ where: { id: +id } });
+            const todo = await this.todoRepository.delete(+id);
 
             res.status(200).json({ message: `Todo with id ${id} deleted successfully`, data: todo });
-        } catch (error) {
-            return res.status(500).json({ message: 'Failed to delete todo' });
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({ message: `${err}` });
         }
     }
 
