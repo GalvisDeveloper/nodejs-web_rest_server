@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "todo" ALTER COLUMN "completedAt" SET DEFAULT CURRENT_TIMESTAMP;
