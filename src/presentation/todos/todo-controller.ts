@@ -21,7 +21,7 @@ export class TodoController {
         new GetTodo(this.todoRepository)
             .execute(+req.params.id)
             .then(todos => res.json(todos))
-            .catch(err => res.status(400).json({ message: `${err}` }))
+            .catch(err => console.log(err))
     }
 
     createTodo = (req: Request, res: Response) => {
