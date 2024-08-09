@@ -6,3 +6,4 @@ keys/
 /postgres
 
 .env
+.env.test
