@@ -100,7 +100,7 @@ describe('Unit Test Todo Routes', () => {
     });
 
     test('Should return an updated TODO only the date', async () => {
-        const { id } = await prisma.todo.create({ data: todo1 });
+        const { id, text } = await prisma.todo.create({ data: todo1 });
         const { body } = await request(testServer.app)
             .put(`/api/todos/${id}`)
             .send({ completedAt: '2023-05-05' })
@@ -108,8 +108,26 @@ describe('Unit Test Todo Routes', () => {
 
         expect(body).toBeInstanceOf(Object);
         expect(body.completedAt).toBe('2023-05-05T00:00:00.000Z');
-        expect(body).toEqual({ id, text: todo1.text, completedAt: expect.any(String) });
+        expect(body).toEqual({ id, text, completedAt: expect.any(String) });
     });
 
+    test('Should delete a TODO', async () => {
+        const { id, text } = await prisma.todo.create({ data: todo1 });
+        const { body } = await request(testServer.app)
+            .delete(`/api/todos/${id}`)
+            .expect(200);
+
+        expect(body).toBeInstanceOf(Object);
+        expect(body).toEqual({ message: `Todo with id ${id} deleted successfully`, data: { id, text, completedAt: expect.any(String) } });
+    })
+
+    test('Should return an error if id doesnt exists -> delete a TODO', async () => {
+        const { body } = await request(testServer.app)
+            .delete(`/api/todos/999`)
+            .expect(400);
+
+        expect(body).toBeInstanceOf(Object);
+        expect(body).toEqual({ message: "Error: Todo with id 999 not found" });
+    })
 
 })
