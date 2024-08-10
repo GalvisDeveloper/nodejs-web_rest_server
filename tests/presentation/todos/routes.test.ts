@@ -47,9 +47,15 @@ describe('Unit Test Todo Routes', () => {
 
         expect(body).toBeInstanceOf(Object);
         expect(body.text).toBe(todo1.text);
+    });
 
-        expect(body).toEqual({ id, text: todo1.text });
+    test('Should return a 404 if TODO not found', async () => {
+        const { body } = await request(testServer.app)
+            .get('/api/todos/999999')
+            .expect(400);
 
+        expect(body).toBeInstanceOf(Object);
+        expect(body).toEqual({ message: "Error: Todo with id 999999 not found" });
     });
 
 
