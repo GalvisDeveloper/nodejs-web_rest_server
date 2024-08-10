@@ -52,10 +52,10 @@ describe('Unit Test Todo Routes', () => {
     test('Should return a 404 if TODO not found', async () => {
         const { body } = await request(testServer.app)
             .get('/api/todos/999999')
-            .expect(400);
+            .expect(404);
 
         expect(body).toBeInstanceOf(Object);
-        expect(body).toEqual({ message: "Error: Todo with id 999999 not found" });
+        expect(body).toEqual({ message: "Todo with id 999999 not found" });
     });
 
     test('Should create a new TODO', async () => {
@@ -93,10 +93,10 @@ describe('Unit Test Todo Routes', () => {
     test('Should return a 404 if TODO not found', async () => {
         const { body } = await request(testServer.app)
             .put('/api/todos/999999')
-            .expect(400);
+            .expect(404);
 
         expect(body).toBeInstanceOf(Object);
-        expect(body).toEqual({ message: "Error: Todo with id 999999 not found" });
+        expect(body).toEqual({ message: "Todo with id 999999 not found" });
     });
 
     test('Should return an updated TODO only the date', async () => {
@@ -124,10 +124,10 @@ describe('Unit Test Todo Routes', () => {
     test('Should return an error if id doesnt exists -> delete a TODO', async () => {
         const { body } = await request(testServer.app)
             .delete(`/api/todos/999`)
-            .expect(400);
+            .expect(404);
 
         expect(body).toBeInstanceOf(Object);
-        expect(body).toEqual({ message: "Error: Todo with id 999 not found" });
+        expect(body).toEqual({ message: "Todo with id 999 not found" });
     })
 
 })
